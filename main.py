@@ -103,7 +103,7 @@ async def process_image_with_openai(image_data: bytes, update: Update, progress_
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": "Изучи изображение. Если в нем содержится задача, реши её как школьник и дай ответ по шагам. Если не задача, просто дай описание изображения."},
+                    {"type": "text", "text": "Изучи изображение. Если в нем содержится задача, определи для кого она возраста, реши её как школьник соответствующего возраста и дай ответ по шагам, но в пределах нескольких предложений. Если на изображении не задача, просто дай его короткое описание."},
                     {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"}}
                 ]
             }
@@ -117,11 +117,23 @@ async def process_image_with_openai(image_data: bytes, update: Update, progress_
 
     return result_text
 
+# Обработка любых текстовых сообщений и файлов
+async def handle_text_or_file(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Проверяем, есть ли фото в сообщении
+    if update.message.photo:
+        await handle_image(update, context)
+    else:
+        # Если файл не фото или неразрешенное вложение, отправляем сообщение
+        await update.message.reply_text("Пришли фотку с домашним заданием и я решу его.")
+        await update.message.reply_text("🤖")
+
+
 def main() -> None:
     application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.PHOTO, handle_image))
+    application.add_handler(MessageHandler(filters.TEXT | filters.ATTACHMENT, handle_text_or_file))
     application.add_handler(CallbackQueryHandler(cancel, pattern='^cancel$'))
 
     application.run_polling()
