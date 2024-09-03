@@ -113,9 +113,18 @@ async def process_image_with_openai(image_data: bytes, update: Update, progress_
 
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
 
-    result_text = response.json()["choices"][0]["message"]["content"]
+    # Логируем полный ответ для отладки
+    logging.info(f"OpenAI API response status: {response.status_code}")
+    logging.info(f"OpenAI API response content: {response.json()}")
 
+    if response.status_code == 200:
+        result_text = response.json().get("choices", [{}])[0].get("message", {}).get("content", "No content returned.")
+    else:
+        result_text = f"Error: {response.status_code} - {response.json()}"
+        
     return result_text
+
+
 
 # Обработка любых текстовых сообщений и файлов
 async def handle_text_or_file(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
