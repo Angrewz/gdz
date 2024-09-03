@@ -14,8 +14,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Получение токенов из переменных окружения
-TELEGRAM_BOT_TOKEN = os.getenv('GDZ_TELEGRAM_BOT_TOKEN')
-OPENAI_API_KEY = os.getenv('GDZ_OPENAI_API_KEY')
+TELEGRAM_BOT_TOKEN_GDZ = os.getenv('GDZ_TELEGRAM_BOT_TOKEN')
+OPENAI_API_KEY_GDZ = os.getenv('GDZ_OPENAI_API_KEY')
 
 # Настройка логирования
 logging.basicConfig(
@@ -24,7 +24,7 @@ logging.basicConfig(
 )
 
 # Задайте свой токен для OpenAI
-openai.api_key = OPENAI_API_KEY
+openai.api_key = OPENAI_API_KEY_GDZ
 
 # Функция для регистрации пользователя
 async def register_user(user_id):
@@ -129,7 +129,7 @@ async def handle_text_or_file(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 def main() -> None:
-    application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
+    application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN_GDZ).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.PHOTO, handle_image))
